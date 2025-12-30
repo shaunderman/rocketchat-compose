@@ -1,3 +1,5 @@
+# THIS FORK
+This fork adds the [GeoBlock](https://github.com/PascalMinder/geoblock) plugin to the Rocket.Chat docker compose files to enable blocking of IPs based on their country of origin. Enjoy!
 
 # Rocket.Chat Compose Files
 
