@@ -119,10 +119,9 @@ services:
       - --providers.file.filename=/traefik_config/${TRAEFIK_PROTOCOL}/dynamic.yml
       - --providers.file.watch=true
       # Enable general logs and set level (DEBUG provides more detail)
-      - --log.level=${TRAEFIK_LOG_LEVEL:-DEBUG}
-      - --log.filePath=/logs/traefik.log
+      - --log.level=${TRAEFIK_LOG_LEVEL:-INFO}
       - --accesslog=true
-      - --accesslog.filePath=/logs/traefik.access.log
+      - --accesslog.format=common  # Recommended: JSON lines, easy to parse
       # GeoBlock
       - --experimental.plugins.GeoBlock.modulename=github.com/PascalMinder/GeoBlock
       - --experimental.plugins.GeoBlock.version=v0.2.2
