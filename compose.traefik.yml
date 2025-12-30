@@ -57,6 +57,26 @@ services:
               rule: Host(`{{ env "DOMAIN" }}`)
               tls:
                 certResolver: le
+              middlewares:
+                - myGeoBlock  # Attach the middleware here
+
+          middlewares:
+            myGeoBlock:
+              plugin:
+                GeoBlock:
+                  allowLocalRequests: true
+                  logLocalRequests: false
+                  logAllowedRequests: false
+                  logApiRequests: true
+                  api: "https://get.geojs.io/v1/ip/country/{ip}"
+                  apiTimeoutMs: 250 # optional
+                  cacheSize: 25
+                  forceMonthlyUpdate: true
+                  allowUnknownCountries: false
+                  unknownCountryApiResponse: "nil"
+                  countries:
+                    - CA  # Only Canada allowed (add more ISO codes as needed)
+                    - US
         EOF
 
         cat /traefik_config/services.tpl >> /traefik_config/http/dynamic.yml
@@ -98,6 +118,14 @@ services:
       - --metrics.prometheus.addServicesLabels=true
       - --providers.file.filename=/traefik_config/${TRAEFIK_PROTOCOL}/dynamic.yml
       - --providers.file.watch=true
+      # Enable general logs and set level (DEBUG provides more detail)
+      - --log.level=${TRAEFIK_LOG_LEVEL:-DEBUG}
+      - --log.filePath=/logs/traefik.log
+      - --accesslog=true
+      - --accesslog.filePath=/logs/traefik.access.log
+      # GeoBlock
+      - --experimental.plugins.GeoBlock.modulename=github.com/PascalMinder/GeoBlock
+      - --experimental.plugins.GeoBlock.version=v0.2.2
     ports:
       - ${TRAEFIK_HTTP_PORT:-80}:${TRAEFIK_HTTP_PORT:-80}
       - ${TRAEFIK_DASHBOARD_PORT:-8080}:8080
